@@ -4,7 +4,7 @@
   "description": "Simple Cloud Formation for Node.js",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "standard && mocha"
   },
   "repository": {
     "type": "git",
