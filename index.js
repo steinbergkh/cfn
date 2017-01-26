@@ -82,7 +82,7 @@ function Cfn (name, template) {
   var startedAt = Date.now()
   var params = opts.params
   var awsConfig = opts.awsConfig
-  var capabilities = opts.capabilities || ['CAPABILITY_IAM']
+  var capabilities = opts.capabilities || [ 'CAPABILITY_IAM' ]
   var awsOpts = {}
   var async = opts.async
   var checkStackInterval = opts.checkStackInterval || 5000
@@ -96,7 +96,7 @@ function Cfn (name, template) {
     _.merge(awsOpts, awsConfig)
   }
 
-    // initialize cf
+  // initialize cf
   var cf = new AWS.CloudFormation(awsOpts)
 
   name = opts.name || name
@@ -112,18 +112,18 @@ function Cfn (name, template) {
       var interval
       var running = false
 
-            // on success:
-            // 1. clear interval
-            // 2. return resolved promise
+      // on success:
+      // 1. clear interval
+      // 2. return resolved promise
       function _success () {
         clearInterval(interval)
         return resolve()
       }
 
-            // on fail:
-            // 1. build fail message
-            // 2. clear interval
-            // 3. return rejected promise with failed message
+      // on fail:
+      // 1. build fail message
+      // 2. clear interval
+      // 3. return rejected promise with failed message
       function _failure (msg) {
         var fullMsg = logPrefix + ' Failed' + (msg ? ': ' + msg : '')
         clearInterval(interval)
@@ -133,17 +133,17 @@ function Cfn (name, template) {
       function _processEvents (events) {
         events = _.sortBy(events, 'Timestamp')
         _.forEach(events, function (event) {
-          displayedEvents[event.EventId] = true
+          displayedEvents[ event.EventId ] = true
           if (moment(event.Timestamp).valueOf() >= startedAt) {
             log(sprintf('[%s] %s %s: %s - %s  %s  %s',
-                            chalk.gray(moment(event.Timestamp).format('HH:mm:ss')),
-                            ings[action],
-                            chalk.cyan(name),
-                            event.ResourceType,
-                            event.LogicalResourceId,
-                            chalk[colorMap[event.ResourceStatus]](event.ResourceStatus),
-                            event.ResourceStatusReason || ''
-                        ))
+              chalk.gray(moment(event.Timestamp).format('HH:mm:ss')),
+              ings[ action ],
+              chalk.cyan(name),
+              event.ResourceType,
+              event.LogicalResourceId,
+              chalk[ colorMap[ event.ResourceStatus ] ](event.ResourceStatus),
+              event.ResourceStatusReason || ''
+            ))
           }
         })
 
@@ -153,10 +153,10 @@ function Cfn (name, template) {
         var status = lastEvent.ResourceStatus
         var statusReason = lastEvent.ResourceStatusReason
 
-                // Only fail/succeed on cloud formation stack resource
+        // Only fail/succeed on cloud formation stack resource
         if (resourceType === 'AWS::CloudFormation::Stack') {
-                    // if cf stack status indicates failure AND the failed event occurred during this update, notify of failure
-                    // if cf stack status indicates success, OR it failed before this current update, notify of success
+          // if cf stack status indicates failure AND the failed event occurred during this update, notify of failure
+          // if cf stack status indicates success, OR it failed before this current update, notify of success
           if (_.includes(failed, status) && (timestamp >= startedAt)) {
             _failure(statusReason)
           } else if (_.includes(success, status) || (_.includes(failed, status) && (timestamp < startedAt))) {
@@ -166,7 +166,7 @@ function Cfn (name, template) {
         running = false
       }
 
-            // provides all pagination
+      // provides all pagination
       function getAllStackEvents (stackName) {
         var next
         var allEvents = []
@@ -176,13 +176,14 @@ function Cfn (name, template) {
             StackName: stackName,
             NextToken: next
           })
-                        .promise()
-                        .then(function (data) {
-                          next = (data || {}).NextToken
-                          allEvents = allEvents.concat(data.StackEvents)
-                          return !next ? Promise.resolve() : getStackEvents()
-                        })
+            .promise()
+            .then(function (data) {
+              next = (data || {}).NextToken
+              allEvents = allEvents.concat(data.StackEvents)
+              return !next ? Promise.resolve() : getStackEvents()
+            })
         }
+
         return getStackEvents().then(function () {
           return allEvents
         })
@@ -197,30 +198,30 @@ function Cfn (name, template) {
         running = true
 
         return getAllStackEvents(name)
-                    .then(function (allEvents) {
-                      running = false
-                      _.forEach(allEvents, function (event) {
-                            // if event has already been seen, don't add to events to process list
-                        if (displayedEvents[event.EventId]) {
-                          return
-                        }
-                        events.push(event)
-                      })
-                      return _processEvents(events)
-                    }).catch(function (err) {
-                        // if stack does not exist, notify success
-                      if (err && notExists.test(err)) {
-                        return _success()
-                      }
-                        // if throttling has occurred, process events again
-                      if (err && throttling.test(err)) {
-                        return _processEvents(events)
-                      }
-                        // otherwise, notify of failure
-                      if (err) {
-                        return _failure(err)
-                      }
-                    })
+          .then(function (allEvents) {
+            running = false
+            _.forEach(allEvents, function (event) {
+              // if event has already been seen, don't add to events to process list
+              if (displayedEvents[ event.EventId ]) {
+                return
+              }
+              events.push(event)
+            })
+            return _processEvents(events)
+          }).catch(function (err) {
+            // if stack does not exist, notify success
+            if (err && notExists.test(err)) {
+              return _success()
+            }
+            // if throttling has occurred, process events again
+            if (err && throttling.test(err)) {
+              return _processEvents(events)
+            }
+            // otherwise, notify of failure
+            if (err) {
+              return _failure(err)
+            }
+          })
       }, checkStackInterval)
     })
   }
@@ -229,11 +230,11 @@ function Cfn (name, template) {
     startedAt = Date.now()
     if (action === 'update') {
       return cf.updateStack(cfparms).promise()
-                .catch(function (err) {
-                  if (!/No updates are to be performed/.test(err)) {
-                    throw err
-                  }
-                })
+        .catch(function (err) {
+          if (!/No updates are to be performed/.test(err)) {
+            throw err
+          }
+        })
     }
     return cf.createStack(cfparms).promise()
   }
@@ -251,68 +252,68 @@ function Cfn (name, template) {
     var promise
 
     switch (true) {
-            // Check if template if a `js` file
+      // Check if template if a `js` file
       case _.endsWith(template, '.js'):
         promise = loadJs(template)
         break
 
-            // Check if template is an object, assume this is JSON good to go
+      // Check if template is an object, assume this is JSON good to go
       case _.isObjectLike(template):
         promise = Promise.resolve(JSON.stringify(template))
         break
 
-            // Default to loading template from file.
+      // Default to loading template from file.
       default:
         promise = fs.readFileAsync(template, 'utf8')
     }
 
     return promise
-            .then(function (data) {
-              return processCfStack(action, {
-                StackName: name,
-                Capabilities: capabilities,
-                TemplateBody: data
-              })
-            })
-            .then(function () {
-              return async ? Promise.resolve() : checkStack(action, name)
-            })
+      .then(function (data) {
+        return processCfStack(action, {
+          StackName: name,
+          Capabilities: capabilities,
+          TemplateBody: data
+        })
+      })
+      .then(function () {
+        return async ? Promise.resolve() : checkStack(action, name)
+      })
   }
 
   this.stackExists = function (overrideName) {
     return cf.describeStacks({ StackName: overrideName || name }).promise()
-            .then(function (data) {
-              return _.includes(exists, data.Stacks[0].StackStatus)
-            })
-            .catch(function () {
-              return false
-            })
+      .then(function (data) {
+        return _.includes(exists, data.Stacks[ 0 ].StackStatus)
+      })
+      .catch(function () {
+        return false
+      })
   }
 
   this.createOrUpdate = function () {
     return this.stackExists()
-            .then(function (exists) {
-              return processStack(exists ? 'update' : 'create', name, template)
-            })
+      .then(function (exists) {
+        return processStack(exists ? 'update' : 'create', name, template)
+      })
   }
 
   this.delete = function (overrideName) {
     startedAt = Date.now()
     return cf.deleteStack({ StackName: overrideName || name }).promise()
-            .then(function () {
-              return async ? Promise.resolve() : checkStack('delete', overrideName || name)
-            })
+      .then(function () {
+        return async ? Promise.resolve() : checkStack('delete', overrideName || name)
+      })
   }
 
   this.outputs = function () {
     return cf.describeStacks({ StackName: name }).promise()
-            .then(function (data) {
-              return flow(
-                    get('Stacks[0].Outputs'),
-                    keyBy('OutputKey'),
-                    mapValues('OutputValue')
-                )(data)
-            })
+      .then(function (data) {
+        return flow(
+          get('Stacks[0].Outputs'),
+          keyBy('OutputKey'),
+          mapValues('OutputValue')
+        )(data)
+      })
   }
 
   this.cleanup = function (opts) {
@@ -340,41 +341,41 @@ function Cfn (name, template) {
 
           ]
         }).promise()
-                    .then(function (data) {
-                      next = data.NextToken
-                      done = !next
-                      return data.StackSummaries
-                    })
-                    .each(function (stack) {
-                      var millisOld = Date.now() - ((minutesOld || 0) * ONE_MINUTE)
-                      if (regex.test(stack.StackName) && moment(stack.CreationTime).valueOf() < millisOld) {
-                        stacks.push(stack)
-                      }
-                    })
-                    .then(function () {
-                      return loop()
-                    })
+          .then(function (data) {
+            next = data.NextToken
+            done = !next
+            return data.StackSummaries
+          })
+          .each(function (stack) {
+            var millisOld = Date.now() - ((minutesOld || 0) * ONE_MINUTE)
+            if (regex.test(stack.StackName) && moment(stack.CreationTime).valueOf() < millisOld) {
+              stacks.push(stack)
+            }
+          })
+          .then(function () {
+            return loop()
+          })
       }
       return Promise.resolve()
     })()
-            .then(function () {
-              var filteredStacks = _.sortBy(stacks, ['CreationTime'])
+      .then(function () {
+        var filteredStacks = _.sortBy(stacks, [ 'CreationTime' ])
 
-              if (limit) {
-                filteredStacks = _.take(filteredStacks, limit)
-              }
-              _.forEach(filteredStacks, function (stack) {
-                if (dryRun) {
-                  log('Will clean up ' + stack.StackName + ' Created ' + stack.CreationTime)
-                } else {
-                  log('Cleaning up ' + stack.StackName + ' Created ' + stack.CreationTime)
-                  return self.delete(stack.StackName, async)
-                            .catch(function (err) {
-                              log('DELETE ERROR: ', err)
-                            })
-                }
+        if (limit) {
+          filteredStacks = _.take(filteredStacks, limit)
+        }
+        _.forEach(filteredStacks, function (stack) {
+          if (dryRun) {
+            log('Will clean up ' + stack.StackName + ' Created ' + stack.CreationTime)
+          } else {
+            log('Cleaning up ' + stack.StackName + ' Created ' + stack.CreationTime)
+            return self.delete(stack.StackName, async)
+              .catch(function (err) {
+                log('DELETE ERROR: ', err)
               })
-            })
+          }
+        })
+      })
   }
 }
 
