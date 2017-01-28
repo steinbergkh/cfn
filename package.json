@@ -61,12 +61,14 @@
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.6.1",
+    "coveralls": "^2.11.15",
+    "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "mocha-lcov-reporter": "^1.2.0",
     "node-uuid": "^1.4.7",
     "should": "^11.1.2",
     "should-sinon": "0.0.5",
     "sinon": "^1.17.7",
-    "standard": "^8.6.0",
-    "xo": "^0.16.0"
+    "standard": "^8.6.0"
   }
 }
