@@ -1,8 +1,0 @@
-#machine:
-#  environment:
-#    AWS_REGION: us-west-2
-
-## Customize test commands
-#test:
-#  override:
-#    - node test | tap-xunit > $CIRCLE_TEST_REPORTS/junit.xml
