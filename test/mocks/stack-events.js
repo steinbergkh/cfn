@@ -1,4 +1,4 @@
-var uuid = require('node-uuid')
+var uuid = require('uuid')
 var stackEventsMock = {}
 
 // creates date with time in future passed as param (int from -INT_MAX to +INT_MAX)
